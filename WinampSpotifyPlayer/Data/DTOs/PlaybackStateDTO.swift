@@ -11,7 +11,7 @@ import Foundation
 ///
 /// This DTO represents the player state object received from the
 /// Spotify Web Playback SDK via the JavaScript bridge.
-struct PlaybackStateDTO: Decodable {
+struct PlaybackStateDTO: Decodable, Sendable {
     let paused: Bool
     let position: Int
     let duration: Int
@@ -20,12 +20,12 @@ struct PlaybackStateDTO: Decodable {
     let track_window: TrackWindowDTO
 
     /// DTO for the current track window
-    struct TrackWindowDTO: Decodable {
+    struct TrackWindowDTO: Decodable, Sendable {
         let current_track: TrackInfoDTO
     }
 
     /// Simplified track info from the playback SDK
-    struct TrackInfoDTO: Decodable {
+    struct TrackInfoDTO: Decodable, Sendable {
         let id: String
         let uri: String
         let name: String
@@ -35,12 +35,12 @@ struct PlaybackStateDTO: Decodable {
     }
 
     /// Simplified artist info from playback SDK
-    struct SimpleArtistDTO: Decodable {
+    struct SimpleArtistDTO: Decodable, Sendable {
         let name: String
     }
 
     /// Simplified album info from playback SDK
-    struct SimpleAlbumDTO: Decodable {
+    struct SimpleAlbumDTO: Decodable, Sendable {
         let name: String
         let images: [ImageDTO]
     }

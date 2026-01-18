@@ -8,7 +8,7 @@
 import Foundation
 
 /// Data Transfer Object for Spotify user API responses
-struct UserDTO: Decodable {
+struct UserDTO: Decodable, Sendable {
     let id: String
     let display_name: String
     let email: String?
@@ -16,7 +16,7 @@ struct UserDTO: Decodable {
 }
 
 /// DTO for image objects in Spotify API responses
-struct ImageDTO: Decodable {
+struct ImageDTO: Decodable, Sendable {
     let url: String
     let height: Int?
     let width: Int?

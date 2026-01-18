@@ -9,7 +9,8 @@ import Foundation
 import Security
 
 /// Low-level wrapper around macOS Security framework for Keychain operations
-final class KeychainService {
+/// Uses actor isolation to ensure thread-safe access to Keychain
+actor KeychainService {
     /// Service identifier for Keychain items
     private let service: String
 

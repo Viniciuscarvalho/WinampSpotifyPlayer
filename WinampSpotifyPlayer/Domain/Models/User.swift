@@ -8,7 +8,7 @@
 import Foundation
 
 /// Represents a Spotify user with profile information
-struct User {
+struct User: Sendable {
     /// Unique Spotify user ID
     let id: String
 

@@ -8,7 +8,7 @@
 import Foundation
 
 /// Defines repeat mode for playback
-enum RepeatMode: String, Equatable {
+enum RepeatMode: String, Equatable, Sendable {
     /// No repeat
     case off
 
@@ -20,7 +20,7 @@ enum RepeatMode: String, Equatable {
 }
 
 /// Represents the current state of music playback
-struct PlaybackState: Equatable {
+struct PlaybackState: Equatable, Sendable {
     /// Whether music is currently playing
     let isPlaying: Bool
 

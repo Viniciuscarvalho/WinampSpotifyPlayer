@@ -8,7 +8,7 @@
 import Foundation
 
 /// Data Transfer Object for Spotify track API responses
-struct TrackDTO: Decodable {
+struct TrackDTO: Decodable, Sendable {
     let id: String
     let uri: String
     let name: String

@@ -7,13 +7,14 @@
 
 import Foundation
 
-/// Repository for Spotify Web API operations
-final class SpotifyAPIRepository: SpotifyAPIRepositoryProtocol {
+/// Repository for Spotify Web API operations with actor isolation
+actor SpotifyAPIRepository: SpotifyAPIRepositoryProtocol {
     private let httpClient: HTTPClientProtocol
     private var accessToken: String?
 
     /// Token refresh callback - called when 401 is encountered
-    var onTokenExpired: (() async throws -> Void)?
+    /// Uses @Sendable to ensure thread safety across actor boundaries
+    var onTokenExpired: (@Sendable () async throws -> Void)?
 
     /// Initializes the repository
     /// - Parameter httpClient: HTTP client to use for requests
@@ -30,7 +31,7 @@ final class SpotifyAPIRepository: SpotifyAPIRepositoryProtocol {
     // MARK: - Private Helpers
 
     /// Makes an authenticated request with automatic retry on token expiration
-    private func authenticatedRequest<T: Decodable>(
+    private func authenticatedRequest<T: Decodable & Sendable>(
         _ endpoint: String,
         queryItems: [URLQueryItem]? = nil
     ) async throws -> T {
@@ -65,46 +66,46 @@ final class SpotifyAPIRepository: SpotifyAPIRepositoryProtocol {
 
     // MARK: - Response DTOs with Pagination
 
-    private struct PaginatedResponse<T: Decodable>: Decodable {
+    private struct PaginatedResponse<T: Decodable & Sendable>: Decodable, Sendable {
         let items: [T]
         let next: String?
         let total: Int
     }
 
-    private struct PlaylistTracksResponse: Decodable {
+    private struct PlaylistTracksResponse: Decodable, Sendable {
         let items: [PlaylistTrackItem]
         let next: String?
         let total: Int
 
-        struct PlaylistTrackItem: Decodable {
+        struct PlaylistTrackItem: Decodable, Sendable {
             let track: TrackDTO?
         }
     }
 
-    private struct SavedTracksResponse: Decodable {
+    private struct SavedTracksResponse: Decodable, Sendable {
         let items: [SavedTrackItem]
         let next: String?
         let total: Int
 
-        struct SavedTrackItem: Decodable {
+        struct SavedTrackItem: Decodable, Sendable {
             let track: TrackDTO
         }
     }
 
-    private struct SavedAlbumsResponse: Decodable {
+    private struct SavedAlbumsResponse: Decodable, Sendable {
         let items: [SavedAlbumItem]
         let next: String?
         let total: Int
 
-        struct SavedAlbumItem: Decodable {
+        struct SavedAlbumItem: Decodable, Sendable {
             let album: AlbumDTO
         }
     }
 
-    private struct FollowedArtistsResponse: Decodable {
+    private struct FollowedArtistsResponse: Decodable, Sendable {
         let artists: ArtistsCursor
 
-        struct ArtistsCursor: Decodable {
+        struct ArtistsCursor: Decodable, Sendable {
             let items: [ArtistDTO]
             let next: String?
         }

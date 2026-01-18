@@ -8,6 +8,7 @@
 import Foundation
 
 /// Repository for secure token storage using macOS Keychain
+/// Uses actor-isolated KeychainService for thread-safe access
 final class KeychainRepository: KeychainRepositoryProtocol {
     private let keychainService: KeychainService
 
@@ -24,24 +25,24 @@ final class KeychainRepository: KeychainRepositoryProtocol {
 
     // MARK: - KeychainRepositoryProtocol
 
-    func save(accessToken: String) throws {
-        try keychainService.save(accessToken, for: Keys.accessToken)
+    func save(accessToken: String) async throws {
+        try await keychainService.save(accessToken, for: Keys.accessToken)
     }
 
-    func save(refreshToken: String) throws {
-        try keychainService.save(refreshToken, for: Keys.refreshToken)
+    func save(refreshToken: String) async throws {
+        try await keychainService.save(refreshToken, for: Keys.refreshToken)
     }
 
-    func getAccessToken() throws -> String? {
-        try keychainService.retrieve(for: Keys.accessToken)
+    func getAccessToken() async throws -> String? {
+        try await keychainService.retrieve(for: Keys.accessToken)
     }
 
-    func getRefreshToken() throws -> String? {
-        try keychainService.retrieve(for: Keys.refreshToken)
+    func getRefreshToken() async throws -> String? {
+        try await keychainService.retrieve(for: Keys.refreshToken)
     }
 
-    func deleteTokens() throws {
-        try keychainService.delete(for: Keys.accessToken)
-        try keychainService.delete(for: Keys.refreshToken)
+    func deleteTokens() async throws {
+        try await keychainService.delete(for: Keys.accessToken)
+        try await keychainService.delete(for: Keys.refreshToken)
     }
 }

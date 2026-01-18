@@ -34,9 +34,12 @@ final class SpotifyAuthUseCase: SpotifyAuthUseCaseProtocol {
             clientSecret: SpotifyConfig.clientSecret
         )
 
-        // Set up automatic token refresh callback
-        spotifyAPIRepository.onTokenExpired = { [weak self] in
-            try await self?.refreshAccessToken()
+        // Set up automatic token refresh callback using Task
+        Task { [weak self, spotifyAPIRepository] in
+            await spotifyAPIRepository.onTokenExpired = { @Sendable in
+                guard let self = self else { return }
+                try await self.refreshAccessToken()
+            }
         }
     }
 
@@ -55,13 +58,13 @@ final class SpotifyAuthUseCase: SpotifyAuthUseCaseProtocol {
         let tokenResponse = try await oauthClient.exchangeCodeForToken(authCode)
 
         // Store tokens in Keychain
-        try keychainRepository.save(accessToken: tokenResponse.access_token)
+        try await keychainRepository.save(accessToken: tokenResponse.access_token)
         if let refreshToken = tokenResponse.refresh_token {
-            try keychainRepository.save(refreshToken: refreshToken)
+            try await keychainRepository.save(refreshToken: refreshToken)
         }
 
         // Update API repository with new token
-        spotifyAPIRepository.setAccessToken(tokenResponse.access_token)
+        await spotifyAPIRepository.setAccessToken(tokenResponse.access_token)
 
         // Fetch and return user profile
         let userDTO = try await spotifyAPIRepository.fetchUserProfile()
@@ -70,7 +73,7 @@ final class SpotifyAuthUseCase: SpotifyAuthUseCaseProtocol {
 
     func refreshAccessToken() async throws {
         // Get refresh token from Keychain
-        guard let refreshToken = try keychainRepository.getRefreshToken() else {
+        guard let refreshToken = try await keychainRepository.getRefreshToken() else {
             throw APIError.unauthorized
         }
 
@@ -78,29 +81,29 @@ final class SpotifyAuthUseCase: SpotifyAuthUseCaseProtocol {
         let tokenResponse = try await oauthClient.refreshToken(refreshToken)
 
         // Store new access token
-        try keychainRepository.save(accessToken: tokenResponse.access_token)
+        try await keychainRepository.save(accessToken: tokenResponse.access_token)
 
         // Update new refresh token if provided
         if let newRefreshToken = tokenResponse.refresh_token {
-            try keychainRepository.save(refreshToken: newRefreshToken)
+            try await keychainRepository.save(refreshToken: newRefreshToken)
         }
 
         // Update API repository with new token
-        spotifyAPIRepository.setAccessToken(tokenResponse.access_token)
+        await spotifyAPIRepository.setAccessToken(tokenResponse.access_token)
     }
 
     func logout() async throws {
         // Clear all tokens from Keychain
-        try keychainRepository.deleteTokens()
+        try await keychainRepository.deleteTokens()
 
         // Clear token from API repository
-        spotifyAPIRepository.setAccessToken("")
+        await spotifyAPIRepository.setAccessToken("")
     }
 
-    var isAuthenticated: Bool {
+    func checkAuthentication() async -> Bool {
         do {
-            let accessToken = try keychainRepository.getAccessToken()
-            let refreshToken = try keychainRepository.getRefreshToken()
+            let accessToken = try await keychainRepository.getAccessToken()
+            let refreshToken = try await keychainRepository.getRefreshToken()
             return accessToken != nil && refreshToken != nil
         } catch {
             return false

@@ -8,8 +8,8 @@
 import Foundation
 
 /// Protocol for HTTP client (enables testing with mocks)
-protocol HTTPClientProtocol {
-    func request<T: Decodable>(
+protocol HTTPClientProtocol: Sendable {
+    func request<T: Decodable & Sendable>(
         _ endpoint: String,
         method: HTTPMethod,
         headers: [String: String]?,
@@ -18,15 +18,15 @@ protocol HTTPClientProtocol {
 }
 
 /// HTTP methods
-enum HTTPMethod: String {
+enum HTTPMethod: String, Sendable {
     case get = "GET"
     case post = "POST"
     case put = "PUT"
     case delete = "DELETE"
 }
 
-/// HTTP client wrapper around URLSession
-final class HTTPClient: HTTPClientProtocol {
+/// HTTP client wrapper around URLSession with actor isolation for thread safety
+actor HTTPClient: HTTPClientProtocol {
     private let session: URLSession
     private let baseURL: String
 
@@ -46,7 +46,7 @@ final class HTTPClient: HTTPClientProtocol {
     ///   - headers: Optional HTTP headers
     ///   - queryItems: Optional URL query parameters
     /// - Returns: Decoded response object
-    func request<T: Decodable>(
+    func request<T: Decodable & Sendable>(
         _ endpoint: String,
         method: HTTPMethod = .get,
         headers: [String: String]? = nil,
@@ -140,5 +140,3 @@ final class HTTPClient: HTTPClientProtocol {
         }
     }
 }
-
-// Extension removed - allHeaderFields property used instead

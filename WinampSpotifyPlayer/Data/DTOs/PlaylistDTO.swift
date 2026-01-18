@@ -8,7 +8,7 @@
 import Foundation
 
 /// Data Transfer Object for Spotify playlist API responses
-struct PlaylistDTO: Decodable {
+struct PlaylistDTO: Decodable, Sendable {
     let id: String
     let name: String
     let description: String?
@@ -18,12 +18,12 @@ struct PlaylistDTO: Decodable {
 }
 
 /// DTO for playlist tracks container
-struct TracksContainerDTO: Decodable {
+struct TracksContainerDTO: Decodable, Sendable {
     let total: Int
 }
 
 /// DTO for playlist owner information
-struct OwnerDTO: Decodable {
+struct OwnerDTO: Decodable, Sendable {
     let id: String
     let display_name: String?
 }

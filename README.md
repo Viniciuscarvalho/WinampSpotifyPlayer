@@ -112,9 +112,13 @@ The app automatically captures your Mac's media keys:
 
 ## 📸 Screenshots
 
-<!-- TODO: Add screenshots after UI redesign -->
+<div align="center">
 
-*Screenshots coming soon...*
+![Winamp Spotify Player Interface](.github/screenshot.png)
+
+*Classic Winamp interface with modern Spotify streaming*
+
+</div>
 
 ---
 
@@ -123,8 +127,8 @@ The app automatically captures your Mac's media keys:
 ### Requirements
 
 - macOS 12.0 (Monterey) or later
-- Xcode 14.0 or later
-- Swift 5.9+
+- Xcode 15.0 or later
+- Swift 6.0+
 - Spotify Premium account
 
 ### Build Steps
@@ -177,12 +181,13 @@ This project follows **Clean Architecture** principles with clear separation of 
 
 ### Tech Stack
 
-- **Language**: Swift 5.9+
-- **UI Framework**: SwiftUI
-- **Reactive Programming**: Combine
+- **Language**: Swift 6.0+ with complete concurrency checking
+- **UI Framework**: SwiftUI with async/await patterns
+- **Reactive Programming**: Combine + Async Sequences
 - **Architecture**: Clean Architecture (MVVM + Use Cases)
+- **Concurrency**: Swift 6 strict concurrency with Sendable protocols
 - **API Integration**: Spotify Web API + Web Playback SDK
-- **Secure Storage**: macOS Keychain
+- **Secure Storage**: macOS Keychain with actor isolation
 
 ---
 

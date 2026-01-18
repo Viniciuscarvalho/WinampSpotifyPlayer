@@ -8,7 +8,7 @@
 import Foundation
 
 /// Represents a Spotify album
-struct Album: Identifiable, Equatable {
+struct Album: Identifiable, Equatable, Sendable {
     /// Unique Spotify album ID
     let id: String
 
