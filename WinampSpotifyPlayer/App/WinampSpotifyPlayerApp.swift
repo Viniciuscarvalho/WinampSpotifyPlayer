@@ -10,28 +10,24 @@ import SwiftUI
 @main
 struct WinampSpotifyPlayerApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject private var coordinator = AppCoordinator()
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if coordinator.isAuthenticated {
+                MainPlayerView(viewModel: coordinator.playerViewModel)
+            } else {
+                AuthenticationView(viewModel: coordinator.authViewModel)
+            }
         }
         .windowStyle(.hiddenTitleBar)
-    }
-}
 
-struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "music.note")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Winamp Spotify Player")
-                .font(.headline)
-            Text("Project initialized successfully")
-                .font(.caption)
-                .foregroundColor(.secondary)
+        WindowGroup("Library") {
+            PlaylistWindowView(
+                viewModel: coordinator.libraryViewModel,
+                playerViewModel: coordinator.playerViewModel
+            )
         }
-        .padding()
-        .frame(width: 300, height: 200)
+        .windowStyle(.hiddenTitleBar)
     }
 }
