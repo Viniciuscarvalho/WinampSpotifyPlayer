@@ -18,7 +18,67 @@ Before installing, ensure you have:
 
 ## 🚀 Installation Methods
 
-### Method 1: Building from Source (Recommended)
+### Method 1: Download Pre-built DMG (Recommended)
+
+**Easiest way to get started!**
+
+#### Step 1: Download DMG
+
+Visit the [Releases page](https://github.com/Viniciuscarvalho/WinampSpotifyPlayer/releases) and download the latest `WinampSpotifyPlayer.dmg`.
+
+```bash
+# Or download via command line
+curl -L -o WinampSpotifyPlayer.dmg \
+  https://github.com/Viniciuscarvalho/WinampSpotifyPlayer/releases/latest/download/WinampSpotifyPlayer.dmg
+```
+
+#### Step 2: Install Application
+
+1. **Open the DMG file**
+   ```bash
+   open WinampSpotifyPlayer.dmg
+   ```
+
+2. **Drag WinampSpotifyPlayer.app to Applications folder**
+   - A Finder window will open with the app and Applications folder shortcut
+   - Drag the app icon to the Applications folder
+
+3. **Launch the Application**
+   ```bash
+   open /Applications/WinampSpotifyPlayer.app
+   ```
+
+4. **First Launch (Gatekeeper)**
+
+   If you see "WinampSpotifyPlayer can't be opened because it is from an unidentified developer":
+
+   - **Option A**: Right-click (or Control+Click) on the app → Click **"Open"** → Click **"Open"** again
+   - **Option B**: System Preferences → Security & Privacy → Click **"Open Anyway"**
+   - **Option C**: Remove quarantine attribute:
+     ```bash
+     xattr -cr /Applications/WinampSpotifyPlayer.app
+     ```
+
+5. **Configure Spotify Credentials** (see Spotify Developer Setup section below)
+
+#### Step 3: Verify Download (Optional but Recommended)
+
+Verify the DMG integrity using the checksum file:
+
+```bash
+# Download checksum file
+curl -L -o WinampSpotifyPlayer_dmg_checksum.txt \
+  https://github.com/Viniciuscarvalho/WinampSpotifyPlayer/releases/latest/download/WinampSpotifyPlayer_dmg_checksum.txt
+
+# Verify
+shasum -a 256 -c WinampSpotifyPlayer_dmg_checksum.txt
+```
+
+You should see: `WinampSpotifyPlayer.dmg: OK`
+
+---
+
+### Method 2: Building from Source
 
 #### Step 1: Clone the Repository
 ```bash
@@ -94,18 +154,38 @@ open ~/Library/Developer/Xcode/DerivedData/WinampSpotifyPlayer-*/Build/Products/
 
 ---
 
-### Method 2: Pre-built Binary (Coming Soon)
+### Method 3: Build Your Own DMG (For Developers)
 
-Download the latest release from the [Releases page](https://github.com/Viniciuscarvalho/WinampSpotifyPlayer/releases):
+If you want to create your own distributable DMG:
 
 ```bash
-# Download the latest .dmg file
-curl -L -o WinampSpotifyPlayer.dmg \
-  https://github.com/Viniciuscarvalho/WinampSpotifyPlayer/releases/latest/download/WinampSpotifyPlayer.dmg
+# Clone repository
+git clone https://github.com/Viniciuscarvalho/WinampSpotifyPlayer.git
+cd WinampSpotifyPlayer
 
-# Mount and install
-open WinampSpotifyPlayer.dmg
-# Drag WinampSpotifyPlayer.app to Applications folder
+# Make scripts executable
+chmod +x scripts/*.sh
+
+# Build release
+./scripts/build-release.sh
+
+# Create DMG
+./scripts/create-dmg.sh
+
+# DMG will be at: build/WinampSpotifyPlayer.dmg
+```
+
+**With code signing** (requires Apple Developer ID):
+
+```bash
+# Set your Developer ID
+export CODESIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)"
+
+# Build with signing
+./scripts/build-release.sh
+
+# Create DMG
+./scripts/create-dmg.sh
 ```
 
 ---
@@ -231,51 +311,6 @@ Use your keyboard's media keys:
 ---
 
 ## 🔧 Advanced Configuration
-
-### Building for Distribution
-
-#### Create Release Build
-```bash
-xcodebuild -project WinampSpotifyPlayer.xcodeproj \
-           -scheme WinampSpotifyPlayer \
-           -configuration Release \
-           -derivedDataPath ./build \
-           clean build
-
-# App will be at:
-# ./build/Build/Products/Release/WinampSpotifyPlayer.app
-```
-
-#### Code Signing (for distribution)
-```bash
-# Sign the app
-codesign --deep --force --verify --verbose \
-         --sign "Developer ID Application: Your Name" \
-         WinampSpotifyPlayer.app
-
-# Verify signature
-codesign --verify --verbose WinampSpotifyPlayer.app
-spctl --assess --verbose WinampSpotifyPlayer.app
-```
-
-#### Create DMG
-```bash
-# Install create-dmg
-brew install create-dmg
-
-# Create installer DMG
-create-dmg \
-  --volname "Winamp Spotify Player" \
-  --volicon "Resources/Assets.xcassets/AppIcon.appiconset/icon.icns" \
-  --window-pos 200 120 \
-  --window-size 600 400 \
-  --icon-size 100 \
-  --icon "WinampSpotifyPlayer.app" 175 120 \
-  --hide-extension "WinampSpotifyPlayer.app" \
-  --app-drop-link 425 120 \
-  "WinampSpotifyPlayer.dmg" \
-  "build/Build/Products/Release/"
-```
 
 ### Uninstallation
 

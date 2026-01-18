@@ -71,6 +71,31 @@ The project follows Clean Architecture principles with three primary layers:
 
 ### 🚀 Quick Start
 
+#### Option 1: Download Pre-built DMG (Recommended)
+
+1. **Download the latest release**
+   - Visit [Releases](https://github.com/Viniciuscarvalho/WinampSpotifyPlayer/releases)
+   - Download `WinampSpotifyPlayer.dmg`
+
+2. **Install**
+   - Open the DMG file
+   - Drag WinampSpotifyPlayer.app to Applications folder
+   - Launch the app (right-click → Open on first launch)
+
+3. **Setup Spotify**
+   - Create a Spotify Developer app at [developer.spotify.com](https://developer.spotify.com/dashboard)
+   - Set redirect URI to `winampspotify://callback`
+   - Configure credentials in the app
+
+4. **Start Playing!**
+   - Authenticate with Spotify
+   - Browse your playlists
+   - Enjoy Winamp nostalgia with Spotify streaming
+
+See [INSTALL.md](INSTALL.md) for detailed installation instructions.
+
+#### Option 2: Build from Source
+
 1. **Setup Spotify Developer Account**
    - See detailed instructions in [SETUP.md](SETUP.md)
    - Register app with redirect URI: `winampspotify://callback`
@@ -84,7 +109,7 @@ The project follows Clean Architecture principles with three primary layers:
 3. **Add Files to Xcode**
    - Open `WinampSpotifyPlayer.xcodeproj`
    - Add all source folders to the project target
-   - See [SETUP.md](SETUP.md) for detailed steps
+   - See [INSTALL.md](INSTALL.md) for detailed steps
 
 4. **Build and Run**
    - Press `⌘+B` to build
@@ -92,7 +117,7 @@ The project follows Clean Architecture principles with three primary layers:
    - Authenticate with Spotify
    - Start playing music!
 
-See [SETUP.md](SETUP.md) for complete setup instructions.
+See [INSTALL.md](INSTALL.md) for complete build instructions.
 
 ### 📚 Documentation
 

@@ -69,17 +69,17 @@ final class MediaKeyHandler {
         // Check if this is a media key event
         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
 
-        // Media key codes (from NSEvent)
-        switch Int(keyCode) {
-        case NX_KEYTYPE_PLAY: // Play/Pause
+        // Media key codes (from NSEvent) - use Int32 to match Carbon types
+        switch Int32(keyCode) {
+        case Int32(NX_KEYTYPE_PLAY): // Play/Pause
             onPlayPause?()
             return nil // Consume the event
 
-        case NX_KEYTYPE_NEXT, NX_KEYTYPE_FAST: // Next track
+        case Int32(NX_KEYTYPE_NEXT), Int32(NX_KEYTYPE_FAST): // Next track
             onNext?()
             return nil
 
-        case NX_KEYTYPE_PREVIOUS, NX_KEYTYPE_REWIND: // Previous track
+        case Int32(NX_KEYTYPE_PREVIOUS), Int32(NX_KEYTYPE_REWIND): // Previous track
             onPrevious?()
             return nil
 

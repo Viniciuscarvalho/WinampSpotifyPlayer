@@ -7,6 +7,7 @@
 
 import Foundation
 import MediaPlayer
+import AppKit
 
 /// Updates macOS Now Playing info for Control Center and Lock Screen
 final class NowPlayingInfoUpdater {

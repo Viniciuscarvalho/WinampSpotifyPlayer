@@ -121,3 +121,38 @@ coverage/
 # Spotify Credentials (IMPORTANT: Never commit these)
 spotify_client_secret.txt
 spotify_credentials.json
+**/SpotifyConfig.swift
+!**/SpotifyConfig-template.swift
+
+# DMG and distribution artifacts
+*.dmg
+*.app
+*.xcarchive
+build/
+*.pkg
+*.zip
+
+# Checksums
+*_checksums.txt
+*_checksum.txt
+VERSION.txt
+
+# Documentation and Scripts (not needed in repo)
+docs/
+scripts/
+
+# Documentation files (generated during development)
+ADD_FILES_TO_XCODE.md
+APP_ICON_GUIDE.md
+COMPLETION_REPORT.md
+DISTRIBUTION.md
+DMG_SETUP_SUMMARY.md
+FIXES_APPLIED.md
+GITHUB_SETUP.md
+ICON_FIX_README.md
+ICON_GENERATION_SUCCESS.md
+NEXT_STEPS.md
+PROJECT_SUMMARY.md
+QUICK_START_CHECKLIST.md
+SPOTIFY_DASHBOARD_TROUBLESHOOTING.md
+SPOTIFY_IOS_SDK_INTEGRATION.md
