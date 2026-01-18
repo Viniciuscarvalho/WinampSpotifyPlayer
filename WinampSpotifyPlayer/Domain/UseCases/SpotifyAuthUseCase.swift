@@ -13,6 +13,7 @@ final class SpotifyAuthUseCase: SpotifyAuthUseCaseProtocol {
     private let keychainRepository: KeychainRepositoryProtocol
     private let spotifyAPIRepository: SpotifyAPIRepository
     private let oauthClient: OAuthClient
+    private var contextProvider: AuthenticationSessionContextProvider?
 
     /// Initializes the auth use case
     /// - Parameters:
@@ -113,13 +114,16 @@ final class SpotifyAuthUseCase: SpotifyAuthUseCaseProtocol {
     /// - Returns: Authorization code from callback
     private func presentAuthenticationSession(url: URL) async throws -> String {
         return try await withCheckedThrowingContinuation { continuation in
-            // Keep strong reference to context provider
-            let contextProvider = AuthenticationSessionContextProvider()
+            // Store context provider as instance property to keep it alive during session
+            self.contextProvider = AuthenticationSessionContextProvider()
 
             let session = ASWebAuthenticationSession(
                 url: url,
                 callbackURLScheme: "winampspotify"
             ) { callbackURL, error in
+                // Clean up context provider when session completes
+                defer { self.contextProvider = nil }
+
                 if let error = error {
                     // User cancelled or other error
                     if (error as NSError).code == ASWebAuthenticationSessionError.canceledLogin.rawValue {
@@ -147,15 +151,13 @@ final class SpotifyAuthUseCase: SpotifyAuthUseCaseProtocol {
                 continuation.resume(returning: code)
             }
 
-            session.presentationContextProvider = contextProvider
+            session.presentationContextProvider = self.contextProvider
             session.prefersEphemeralWebBrowserSession = false
 
             if !session.start() {
+                self.contextProvider = nil
                 continuation.resume(throwing: APIError.invalidResponse)
             }
-
-            // Keep context provider alive for the session
-            withExtendedLifetime(contextProvider) { }
         }
     }
 }
