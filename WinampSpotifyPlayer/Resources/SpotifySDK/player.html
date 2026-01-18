@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spotify Web Playback SDK</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <h3>Spotify Web Playback SDK</h3>
+    <p id="status">Initializing...</p>
+
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <script>
+        let player;
+        let deviceId;
+
+        window.onSpotifyWebPlaybackSDKReady = () => {
+            updateStatus('SDK Ready - Waiting for token...');
+        };
+
+        // Initialize player with access token
+        function initializePlayer(accessToken) {
+            player = new Spotify.Player({
+                name: 'Winamp Spotify Player',
+                getOAuthToken: cb => { cb(accessToken); },
+                volume: 0.5
+            });
+
+            // Error handling
+            player.addListener('initialization_error', ({ message }) => {
+                console.error('Initialization Error:', message);
+                sendMessage('error', { message: 'Initialization failed: ' + message });
+            });
+
+            player.addListener('authentication_error', ({ message }) => {
+                console.error('Authentication Error:', message);
+                sendMessage('error', { message: 'Authentication failed: ' + message });
+            });
+
+            player.addListener('account_error', ({ message }) => {
+                console.error('Account Error:', message);
+                sendMessage('error', { message: 'Account error: ' + message });
+            });
+
+            player.addListener('playback_error', ({ message }) => {
+                console.error('Playback Error:', message);
+                sendMessage('error', { message: 'Playback failed: ' + message });
+            });
+
+            // Ready
+            player.addListener('ready', ({ device_id }) => {
+                console.log('Ready with Device ID', device_id);
+                deviceId = device_id;
+                updateStatus('Connected - Device ID: ' + device_id);
+                sendMessage('ready', { deviceId: device_id });
+            });
+
+            // Not Ready
+            player.addListener('not_ready', ({ device_id }) => {
+                console.log('Device ID has gone offline', device_id);
+                sendMessage('not_ready', { deviceId: device_id });
+            });
+
+            // Player state changed
+            player.addListener('player_state_changed', state => {
+                console.log('State changed:', state);
+                if (state) {
+                    sendMessage('state_changed', {
+                        paused: state.paused,
+                        position: state.position,
+                        duration: state.duration,
+                        shuffle: state.shuffle,
+                        repeat_mode: state.repeat_mode,
+                        track_window: {
+                            current_track: {
+                                id: state.track_window.current_track.id,
+                                uri: state.track_window.current_track.uri,
+                                name: state.track_window.current_track.name,
+                                artists: state.track_window.current_track.artists.map(a => ({ name: a.name })),
+                                album: {
+                                    name: state.track_window.current_track.album.name,
+                                    images: state.track_window.current_track.album.images
+                                },
+                                duration_ms: state.track_window.current_track.duration_ms
+                            }
+                        }
+                    });
+                }
+            });
+
+            // Connect to the player
+            player.connect().then(success => {
+                if (success) {
+                    console.log('Successfully connected to Spotify!');
+                    updateStatus('Connected!');
+                } else {
+                    console.error('Failed to connect');
+                    updateStatus('Failed to connect');
+                    sendMessage('error', { message: 'Failed to connect to Spotify' });
+                }
+            });
+        }
+
+        // Play a track
+        function play(uri, accessToken) {
+            fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+                method: 'PUT',
+                body: JSON.stringify({ uris: [uri] }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Play request failed');
+                }
+                console.log('Playing:', uri);
+            }).catch(error => {
+                console.error('Play error:', error);
+                sendMessage('error', { message: 'Play failed: ' + error.message });
+            });
+        }
+
+        // Pause playback
+        function pause() {
+            player.pause().then(() => {
+                console.log('Paused');
+            });
+        }
+
+        // Resume playback
+        function resume() {
+            player.resume().then(() => {
+                console.log('Resumed');
+            });
+        }
+
+        // Seek to position
+        function seek(positionMs) {
+            player.seek(positionMs).then(() => {
+                console.log('Seeked to', positionMs);
+            });
+        }
+
+        // Set volume
+        function setVolume(volume) {
+            player.setVolume(volume / 100.0).then(() => {
+                console.log('Volume set to', volume);
+            });
+        }
+
+        // Toggle shuffle
+        function toggleShuffle(accessToken) {
+            player.getCurrentState().then(state => {
+                const newShuffleState = !state.shuffle;
+                fetch(`https://api.spotify.com/v1/me/player/shuffle?state=${newShuffleState}&device_id=${deviceId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                }).then(() => {
+                    console.log('Shuffle toggled to', newShuffleState);
+                });
+            });
+        }
+
+        // Set repeat mode
+        function setRepeatMode(mode, accessToken) {
+            const modeMap = { 0: 'off', 1: 'context', 2: 'track' };
+            const modeString = modeMap[mode] || 'off';
+
+            fetch(`https://api.spotify.com/v1/me/player/repeat?state=${modeString}&device_id=${deviceId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            }).then(() => {
+                console.log('Repeat mode set to', modeString);
+            });
+        }
+
+        // Helper to send messages to Swift
+        function sendMessage(type, data) {
+            if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.spotifyPlayer) {
+                window.webkit.messageHandlers.spotifyPlayer.postMessage({
+                    type: type,
+                    data: data
+                });
+            }
+        }
+
+        // Helper to update status text
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+    </script>
+</body>
+</html>
