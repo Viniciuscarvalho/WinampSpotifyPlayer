@@ -16,7 +16,6 @@ struct WinampSpotifyPlayerApp: App {
             ContentView()
         }
         .windowStyle(.hiddenTitleBar)
-        .windowResizability(.contentSize)
     }
 }
 
