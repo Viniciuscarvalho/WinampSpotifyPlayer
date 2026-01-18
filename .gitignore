@@ -141,6 +141,9 @@ VERSION.txt
 docs/
 scripts/
 
+# GitHub Actions workflows (requires workflow scope)
+.github/workflows/
+
 # Documentation files (generated during development)
 ADD_FILES_TO_XCODE.md
 APP_ICON_GUIDE.md
